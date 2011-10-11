@@ -23,6 +23,7 @@ Configuration
 =============
 
 The script can be configured via YAML files that is searched in:
+
 - `/etc/kindle_clippings.yml`
 - `$HOME/.kindle_clippings.yml`
 - `$HOME/.kindle_clippings_$HOSTNAME.yml`

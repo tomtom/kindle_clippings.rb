@@ -3,8 +3,8 @@
 # @Author:      Tom Link (micathom AT gmail com)
 # @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
 # @Created:     2011-10-10.
-# @Last Change: 2011-10-11.
-# @Revision:    151
+# @Last Change: 2011-10-12.
+# @Revision:    171
 
 # require ''
 
@@ -213,6 +213,7 @@ HELP
         skip = false
         loc = nil
         lines = {}
+        raw = []
         title = ""
         File.open(@config['myclippings']).each_line do |line|
             line = (lnum == 0 ? line[3..-1] : line)
@@ -226,8 +227,9 @@ HELP
                 when nil
                     loc = nil
                     lines = {}
+                    raw = []
                     title = line
-                    my_clippings[title] ||= {}
+                    my_clippings[title] ||= {:raw => [], :data => {}}
                     mode = :select
                     $logger.debug "Title: #{title}"
                 when :select
@@ -251,7 +253,7 @@ HELP
                     if line == '=========='
                         mode = nil
                         $logger.debug "Clip: Merge lines: #{lines}"
-                        my_clippings[title].merge!(lines) do |k, o, n|
+                        my_clippings[title][:data].merge!(lines) do |k, o, n|
                             o + n
                         end
                     else
@@ -262,7 +264,7 @@ HELP
                     if line == '=========='
                         mode = nil
                         $logger.debug "Note: Merge lines: #{lines}"
-                        my_clippings[title].merge!(lines) do |k, o, n|
+                        my_clippings[title][:data].merge!(lines) do |k, o, n|
                             o + n
                         end
                     else
@@ -280,6 +282,10 @@ HELP
                 end
             end
             lnum += 1
+            raw << line
+            if mode.nil?
+                my_clippings[title][:raw] += raw
+            end
         end
         return my_clippings
     end
@@ -287,7 +293,8 @@ HELP
     def export_text(my_clippings)
         prefix = " " * 60
         Dir.chdir(@config['outdir']) do
-            my_clippings.each do |title, data|
+            my_clippings.each do |title, data0|
+                data = data0[:data]
                 ctitle = "#{title.gsub(/[[:cntrl:].+*:"?<>|&\\\/%]/, '_')}.txt"
                 text = data.keys.sort.map {|loc| "#{prefix}##{loc}\n#{data[loc].join("\n\n")}\n\n"}
                 unless text.empty?
@@ -303,7 +310,8 @@ HELP
 
     def export_viki(my_clippings)
         Dir.chdir(@config['outdir']) do
-            my_clippings.each do |title, data|
+            my_clippings.each do |title, data0|
+                data = data0[:data]
                 ctitle = "#{title.gsub(/[[:cntrl:].+*:"?<>|&\\\/%]/, '_')}.txt"
                 rx_author = /\([^)]+\)$/
                 tauthor = title[rx_author].gsub(/(^\(|\)$)/, '')
@@ -316,6 +324,18 @@ HELP
                         io.puts(text)
                         io.puts("\n% vi: ft=viki:tw=0")
                     end
+                end
+            end
+        end
+    end
+
+    def export_kindle(my_clippings)
+        Dir.chdir(@config['outdir']) do
+            my_clippings.each do |title, data0|
+                data = data0[:raw] << nil
+                ctitle = "#{title.gsub(/[[:cntrl:].+*:"?<>|&\\\/%]/, '_')}.kindle"
+                File.open(ctitle, 'wb') do |io|
+                    io.puts(data.join("\r\n"))
                 end
             end
         end

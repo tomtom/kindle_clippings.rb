@@ -36,6 +36,10 @@ Example configuration file:
     outdir: /home/tom/Wiki/KindleNotes
     myclippings: /home/tom/sync/Kindle/My Clippings.txt
 
+An initial configuration file can be created with the following command:
+
+    kindle_clippings.rb --print-config > ~/.kindle_clippings.yml
+
 
 Requirements
 ============

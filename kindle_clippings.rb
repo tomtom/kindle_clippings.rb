@@ -60,6 +60,7 @@ class KindleClippings
             AppLog.new
     
             commands = KindleClippings.instance_methods.select {|m| m =~ /^cmd_/}.map {|m| m[4..-1]}
+            formats = KindleClippings.instance_methods.select {|m| m =~ /^export_/}.map {|m| m[7..-1]}
 
             config = Hash.new
             config['outdir'] = Dir.pwd
@@ -90,6 +91,10 @@ class KindleClippings
                     config['outdir'] = value
                 end
 
+                opts.on('--format FORMAT,...', String, "Export format: #{formats.join(", ")} (default: #{config["format"]})") do |value|
+                    config['format'] = value
+                end
+                
                 opts.on('-k VERSION', '--kindle VERSION', Integer, 'Kindle version (default: 2)') do |value|
                     config['kindle_version'] = value
                 end

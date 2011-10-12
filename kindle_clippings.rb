@@ -176,13 +176,13 @@ class KindleClippings
     def cmd_convert
         my_clippings = import
         unless my_clippings.empty?
-            case @config['format']
-            when 'text'
-                export_text(my_clippings)
-            when 'viki'
-                export_viki(my_clippings)
-            else
-                $logger.fatal "Unsupported export format: #{@config['format']}"
+            @config['format'].split(/,/).each do |format|
+                method = "export_#{format}"
+                if respond_to?(method)
+                    send(method, my_clippings)
+                else
+                    $logger.fatal "Unsupported export format: #{format}"
+                end
             end
         end
     end

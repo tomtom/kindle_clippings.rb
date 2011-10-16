@@ -4,7 +4,7 @@
 # @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
 # @Created:     2011-10-10.
 # @Last Change: 2011-10-16.
-# @Revision:    188
+# @Revision:    197
 
 # require ''
 
@@ -345,6 +345,30 @@ HELP
                 ctitle = "#{title.gsub(/[[:cntrl:].+*:"?<>|&\\\/%]/, '_')}.kindle"
                 File.open(ctitle, 'wb') do |io|
                     io.puts(data.join("\r\n"))
+                end
+            end
+        end
+    end
+
+    def export_yaml(my_clippings)
+        Dir.chdir(get_outdir) do
+            my_clippings.each do |title, data0|
+                export = {}
+                data = data0[:data]
+                ctitle = "#{title.gsub(/[[:cntrl:].+*:"?<>|&\\\/%]/, '_')}.yml"
+                rx_author = /\([^)]+\)$/
+                export['author'] = title[rx_author].gsub(/(^\(|\)$)/, '')
+                export['title'] = title.sub(rx_author, '')
+                data.keys.sort.each do |loc|
+                    text = data[loc].join("\n\n")
+                    text.gsub!(/([${}`]|::|__|'')/, '\\\\\\0')
+                    text.gsub!(/^(\s*)(\*+|#\S|(\d+|[a-zA-Z?])\.\s|[%\#@?-]\s)/m, '\1\\\\\\2')
+                    export[loc] = text
+                end
+                unless export.empty?
+                    File.open(ctitle, 'w') do |io|
+                        io.puts YAML.dump(export)
+                    end
                 end
             end
         end

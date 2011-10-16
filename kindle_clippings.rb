@@ -92,7 +92,7 @@ class KindleClippings
                     config['dir'] = value
                 end
 
-                opts.on('--format FORMAT,...', String, "Export format: #{formats.join(", ")} (default: #{config["format"]})") do |value|
+                opts.on('-f', '--format FORMAT,...', String, "Export format: #{formats.join(", ")} (default: #{config["format"]})") do |value|
                     config['format'] = value
                 end
                 

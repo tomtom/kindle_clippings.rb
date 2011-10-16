@@ -4,7 +4,7 @@
 # @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
 # @Created:     2011-10-10.
 # @Last Change: 2011-10-16.
-# @Revision:    197
+# @Revision:    219
 
 # require ''
 
@@ -14,8 +14,9 @@ require 'logger'
 require 'yaml'
 
 class KindleClippings
-    APPNAME = 'kindle_clippings'
+    APPNAME = File.basename($0)
     VERSION = '0.0'
+    HELP = {}
     CONFIGS = []
     if ENV['WINDIR']
         CONFIGS << File.join(File.dirname(ENV['WINDIR'].gsub(/\\/, '/')) ,'kindle_clippings.yml')

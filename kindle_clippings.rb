@@ -4,7 +4,7 @@
 # @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
 # @Created:     2011-10-10.
 # @Last Change: 2011-10-16.
-# @Revision:    173
+# @Revision:    188
 
 # require ''
 
@@ -320,7 +320,12 @@ HELP
                 rx_author = /\([^)]+\)$/
                 tauthor = title[rx_author].gsub(/(^\(|\)$)/, '')
                 ttitle = title.sub(rx_author, '')
-                text = data.keys.sort.map {|loc| "##{loc}\n#{data[loc].join("\n\n")}\n\n"}
+                text = data.keys.sort.map do |loc|
+                    text = data[loc].join("\n\n")
+                    text.gsub!(/([${}`]|::|__|'')/, '\\\\\\0')
+                    text.gsub!(/^(\s*)(\*+|#\S|(\d+|[a-zA-Z?])\.\s|[%\#@?-]\s)/m, '\1\\\\\\2')
+                    "#loc#{loc}\n#{text}\n\n"
+                end
                 unless text.empty?
                     File.open(ctitle, 'w') do |io|
                         io.puts("#TITLE: #{ttitle}")

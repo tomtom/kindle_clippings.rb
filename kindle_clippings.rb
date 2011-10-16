@@ -4,7 +4,7 @@
 # @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
 # @Created:     2011-10-10.
 # @Last Change: 2011-10-16.
-# @Revision:    219
+# @Revision:    220
 
 # require ''
 
@@ -124,9 +124,24 @@ class KindleClippings
                     $VERBOSE = true
                     AppLog.set_level
                 end
-            
-                opts.on_tail('-h', '--help', 'Show this message') do
-                    puts opts
+           
+                HELP['help'] = <<HELP
+#{APPNAME} --help [OPTION]
+
+Show a generic help message or a help message on one of the following topics:
+#{HELP.keys.sort.join("\n")}
+HELP
+                opts.on_tail('-h', '--help [OPTION]', String, 'Show help message or help on a specific option') do |value|
+                    if value.nil?
+                        puts opts
+                    elsif HELP.has_key?(value)
+                        puts HELP[value]
+                    else
+                        puts <<HELP
+Unknown help topic. Use one of:
+#{HELP.keys.sort.join("\n")}
+HELP
+                    end
                     exit 1
                 end
             end
@@ -171,6 +186,11 @@ class KindleClippings
         @config['dir'] || @config['outdir']
     end
 
+    HELP['list'] = <<HELP
+#{APPNAME} -c list ...
+
+List book titles.
+HELP
     def cmd_list
         my_clippings = import
         unless my_clippings.empty?
@@ -178,6 +198,14 @@ class KindleClippings
         end
     end
 
+
+    HELP['convert'] = <<HELP
+#{APPNAME} -c convert ...
+Convert your kindle klippings.
+
+Example usage:
+#{APPNAME} --dir ~/MyClips /media/kindle/My\\ Clippings.txt
+HELP
     def cmd_convert
         my_clippings = import
         unless my_clippings.empty?
@@ -190,15 +218,6 @@ class KindleClippings
                 end
             end
         end
-    end
-
-    def help_convert
-        <<HELP
-Convert your kindle klippings.
-
-Example usage:
-#{APPNAME} --dir ~/MyClips /media/kindle/My\\ Clippings.txt
-HELP
     end
 
     def import
@@ -295,6 +314,10 @@ HELP
         return my_clippings
     end
 
+    HELP['text'] = <<HELP
+#{APPNAME} -c export -f text ...
+Export in plain text format.
+HELP
     def export_text(my_clippings)
         prefix = " " * 60
         Dir.chdir(get_outdir) do
@@ -313,6 +336,10 @@ HELP
         end
     end
 
+    HELP['viki'] = <<HELP
+#{APPNAME} -c export -f viki ...
+Export in viki format (a personal wiki for vim).
+HELP
     def export_viki(my_clippings)
         Dir.chdir(get_outdir) do
             my_clippings.each do |title, data0|
@@ -339,6 +366,12 @@ HELP
         end
     end
 
+    HELP['kindle'] = <<HELP
+#{APPNAME} -c export -f kindle ...
+Export (mostly) original kindle data. There may be certain deviations 
+from the original contents with respect to line end characters and the 
+BOM is missing.
+HELP
     def export_kindle(my_clippings)
         Dir.chdir(get_outdir) do
             my_clippings.each do |title, data0|
@@ -351,6 +384,10 @@ HELP
         end
     end
 
+    HELP['yaml'] = <<HELP
+#{APPNAME} -c export -f yaml ...
+Export in YAML format (computer readable output).
+HELP
     def export_yaml(my_clippings)
         Dir.chdir(get_outdir) do
             my_clippings.each do |title, data0|

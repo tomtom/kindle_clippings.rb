@@ -3,8 +3,8 @@
 # @Author:      Tom Link (micathom AT gmail com)
 # @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
 # @Created:     2011-10-10.
-# @Last Change: 2011-10-12.
-# @Revision:    171
+# @Last Change: 2011-10-16.
+# @Revision:    173
 
 # require ''
 
@@ -63,7 +63,7 @@ class KindleClippings
             formats = KindleClippings.instance_methods.select {|m| m =~ /^export_/}.map {|m| m[7..-1]}
 
             config = Hash.new
-            config['outdir'] = Dir.pwd
+            config['dir'] = Dir.pwd
             config['kindle_version'] = 2
             config['format'] = 'text'
             config['myclippings'] = 'My Clippings.txt'
@@ -88,7 +88,7 @@ class KindleClippings
                 end
 
                 opts.on('-d DIR', '--dir DIR', String, 'Output directory (default: current directory)') do |value|
-                    config['outdir'] = value
+                    config['dir'] = value
                 end
 
                 opts.on('--format FORMAT,...', String, "Export format: #{formats.join(", ")} (default: #{config["format"]})") do |value|
@@ -164,6 +164,10 @@ class KindleClippings
         else
             $logger.fatal "Unknown command: #{@config['command']}"
         end
+    end
+
+    def get_outdir
+        @config['dir'] || @config['outdir']
     end
 
     def cmd_list
@@ -292,7 +296,7 @@ HELP
 
     def export_text(my_clippings)
         prefix = " " * 60
-        Dir.chdir(@config['outdir']) do
+        Dir.chdir(get_outdir) do
             my_clippings.each do |title, data0|
                 data = data0[:data]
                 ctitle = "#{title.gsub(/[[:cntrl:].+*:"?<>|&\\\/%]/, '_')}.txt"
@@ -309,7 +313,7 @@ HELP
     end
 
     def export_viki(my_clippings)
-        Dir.chdir(@config['outdir']) do
+        Dir.chdir(get_outdir) do
             my_clippings.each do |title, data0|
                 data = data0[:data]
                 ctitle = "#{title.gsub(/[[:cntrl:].+*:"?<>|&\\\/%]/, '_')}.txt"
@@ -330,7 +334,7 @@ HELP
     end
 
     def export_kindle(my_clippings)
-        Dir.chdir(@config['outdir']) do
+        Dir.chdir(get_outdir) do
             my_clippings.each do |title, data0|
                 data = data0[:raw] << nil
                 ctitle = "#{title.gsub(/[[:cntrl:].+*:"?<>|&\\\/%]/, '_')}.kindle"

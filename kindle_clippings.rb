@@ -3,8 +3,8 @@
 # @Author:      Tom Link (micathom AT gmail com)
 # @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
 # @Created:     2011-10-10.
-# @Last Change: 2011-10-16.
-# @Revision:    220
+# @Last Change: 2011-11-10.
+# @Revision:    225
 
 # require ''
 
@@ -346,8 +346,13 @@ HELP
                 data = data0[:data]
                 ctitle = "#{title.gsub(/[[:cntrl:].+*:"?<>|&\\\/%]/, '_')}.txt"
                 rx_author = /\([^)]+\)$/
-                tauthor = title[rx_author].gsub(/(^\(|\)$)/, '')
-                ttitle = title.sub(rx_author, '')
+                tauthor = title[rx_author]
+                if tauthor.nil?
+                    ttitle = title
+                else
+                    tauthor.gsub!(/(^\(|\)$)/, '')
+                    ttitle = title.sub(rx_author, '')
+                end
                 text = data.keys.sort.map do |loc|
                     text = data[loc].join("\n\n")
                     text.gsub!(/([${}`]|::|__|'')/, '\\\\\\0')
@@ -357,7 +362,7 @@ HELP
                 unless text.empty?
                     File.open(ctitle, 'w') do |io|
                         io.puts("#TITLE: #{ttitle}")
-                        io.puts("#AUTHOR: #{tauthor}\n\n")
+                        io.puts("#AUTHOR: #{tauthor}\n\n") unless tauthor.nil?
                         io.puts(text)
                         io.puts("\n% vi: ft=viki:tw=0")
                     end

@@ -3,8 +3,8 @@
 # @Author:      Tom Link (micathom AT gmail com)
 # @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
 # @Created:     2011-10-10.
-# @Last Change: 2011-11-10.
-# @Revision:    225
+# @Last Change: 2011-11-11.
+# @Revision:    226
 
 # require ''
 
@@ -101,7 +101,7 @@ class KindleClippings
                 end
                 
                 opts.on('--print-config', 'Print the configuration and exit') do |bool|
-                    puts "Configuration files: #{CONFIGS}"
+                    # puts "Configuration files: #{CONFIGS}"
                     puts YAML.dump(config)
                     exit
                 end
